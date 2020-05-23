@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script>
+        var check = function() {
+            if (document.getElementById('password').value ==
+                document.getElementById('confirm_password').value) {
+                document.getElementById('message').style.color = 'green';
+                document.getElementById('message').innerHTML = 'matching';
+            } else {
+                document.getElementById('message').style.color = 'red';
+                document.getElementById('message').innerHTML = 'not matching';
+            }
+        };
+
+        var checkForm = function(form) {
+            re = /[!@#\$%\^&\*]/;
+            if (re.test(form.name.value)) {
+                alert("Error: Name cannot contain special character!");
+                form.name.focus();
+                return false;
+            }
+            re = /[!@#\$%\^&\*]/;
+            if (!re.test(form.password.value)) {
+                alert("Error: password must contain at least one special character!");
+                form.password.focus();
+                return false;
+            }
+            re = /[0-9]/;
+            if (!re.test(form.password.value)) {
+                alert("Error: password must contain at least one number (0-9)!");
+                form.password.focus();
+                return false;
+            }
+            re = /[a-z]/;
+            if (!re.test(form.password.value)) {
+                alert("Error: password must contain at least one lowercase letter (a-z)!");
+                form.password.focus();
+                return false;
+            }
+            re = /[A-Z]/;
+            if (!re.test(form.password.value)) {
+                alert("Error: password must contain at least one uppercase letter (A-Z)!");
+                form.password.focus();
+                return false;
+            }
+            if (document.getElementById('result').innerHTML == '') {
+                checkavailability();
+                return false;
+            }
+            return true;
+        };
+    </script>
+</head>
+
+<body>
+    <form class="form-horizontal" action="/submit" enctype="multipart/form-data" method="POST" onsubmit="return checkForm(this);">
+        <fieldset>
+            <div id="legend">
+                <legend class="">Register</legend>
+            </div>
+
+            <div class="control-group">
+                <!-- Name -->
+                <label class="control-label" for="name">Name</label>
+                <div class="controls">
+                    <input type="text" id="name" name="name" placeholder="" class="input-xlarge" minlength="3" maxlength="50" style="text-transform: capitalize;" required>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- E-mail -->
+                <label class="control-label" for="email">E-mail</label>
+                <div class="controls">
+                    <input type="email" id="email" name="email" placeholder="" class="input-xlarge" required>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Username -->
+                <label class="control-label" for="username">Username</label>
+                <div class="controls">
+                    <input type="text" id="username" name="username" placeholder="" class="input-xlarge" required>
+                    <button class="btn btn-primary" type="button" onclick="checkavailability()" method="POST">Check Availability</button>
+                    <span id="result"></span>
+                </div>
+            </div>
+            <!--Function to check availability of user name-->
+            <script type="text/javascript">
+                function checkavailability() {
+                    data = {};
+                    data.uname = document.getElementById("username").value;
+
+                    $.ajax({
+                        url: "/checkusername",
+                        method: "POST",
+                        data: JSON.stringify(data),
+                        contentType: 'application/json',
+                        success: function(response) {
+                            if (response) {
+                                document.getElementById('result').innerHTML = "Hurrah😊 username available";
+                            } else {
+                                document.getElementById('result').innerHTML = "Sorry😥 This username is already in use";
+                            }
+                        }
+                    });
+                }
+            </script>
+
+            <div class="control-group">
+                <!-- Profile Image -->
+                <label class="control-label" for="image">Profile Image</label>
+                <div class="controls">
+                    <input type="file" name="mypic" required/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- About me -->
+                <label class="control-label" for="aboutme">About me</label>
+                <div class="controls">
+                    <input type="text" id="about" name="about" placeholder="" class="input-xlarge" maxlength="100">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Password-->
+                <label class="control-label" for="password">Password</label>
+                <div class="controls">
+                    <input type="password" id="password" name="password" placeholder="" class="input-xlarge" minlength="8" required>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Password -->
+                <label class="control-label" for="confirm_password">Confirm Password</label>
+                <div class="controls">
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="" class="input-xlarge" onkeyup='check();' required>
+                    <span id='message'></span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <!-- Button -->
+                <div class="controls">
+                    <button type="submit" value="submit" class="btn btn-success">Register</button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+
+</body>
+
+</html>
